@@ -40,9 +40,6 @@ class Attention(nn.Module):
         B, C = x.shape[:2]
         h = x
 
-
-
-
         q = self.q(h).reshape(B,C,-1)
         k = self.k(h).reshape(B,C,-1)
         v = self.v(h).reshape(B,C,-1)
@@ -123,19 +120,9 @@ class PVConvReLU(nn.Module):
         self.point_features = SharedMLP(in_channels, out_channels)
 
     def forward(self, inputs):
-<<<<<<< Updated upstream
-        features, coords, temb = inputs
-=======
-        # features, coords, temb = inputs
-        features, coords = inputs
->>>>>>> Stashed changes
         voxel_features, voxel_coords = self.voxelization(features, coords)
         voxel_features = self.voxel_layers(voxel_features)
         voxel_features = F.trilinear_devoxelize(voxel_features, voxel_coords, self.resolution, self.training)
         fused_features = voxel_features + self.point_features(features)
-<<<<<<< Updated upstream
-        return fused_features, coords, temb
-=======
         # return fused_features, coords, temb
         return fused_features, coords
->>>>>>> Stashed changes
