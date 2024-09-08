@@ -58,7 +58,11 @@ def create_pointnet_components(blocks, in_channels, embed_dim, with_se=False, no
     return layers, in_channels, concat_channels
 
 
+<<<<<<< Updated upstream
 def create_pointnet2_sa_components(sa_blocks, extra_feature_channels, embed_dim=64, use_att=False,
+=======
+def create_pointnet2_sa_components(sa_blocks, extra_feature_channels, use_att=False,
+>>>>>>> Stashed changes
                                    dropout=0.1, with_se=False, normalize=True, eps=0,
                                    width_multiplier=1, voxel_resolution_multiplier=1):
     r, vr = width_multiplier, voxel_resolution_multiplier
@@ -70,7 +74,10 @@ def create_pointnet2_sa_components(sa_blocks, extra_feature_channels, embed_dim=
         k = 0
         sa_in_channels.append(in_channels)
         sa_blocks = []
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
         if conv_configs is not None:
             out_channels, num_blocks, voxel_resolution = conv_configs
             out_channels = int(r * out_channels)
@@ -84,14 +91,23 @@ def create_pointnet2_sa_components(sa_blocks, extra_feature_channels, embed_dim=
                                               with_se=with_se, with_se_relu=True,
                                               normalize=normalize, eps=eps)
 
+<<<<<<< Updated upstream
                 if c == 0:
                     sa_blocks.append(block(in_channels, out_channels))
                 elif k ==0:
                     sa_blocks.append(block(in_channels+embed_dim, out_channels))
+=======
+                if c == 0 or k == 0:
+                    sa_blocks.append(block(in_channels, out_channels))
+>>>>>>> Stashed changes
                 in_channels = out_channels
                 k += 1
             extra_feature_channels = in_channels
         num_centers, radius, num_neighbors, out_channels = sa_configs
+<<<<<<< Updated upstream
+=======
+        # (1024, 0.1, 32, (32, 64))
+>>>>>>> Stashed changes
         _out_channels = []
         for oc in out_channels:
             if isinstance(oc, (list, tuple)):
@@ -104,7 +120,11 @@ def create_pointnet2_sa_components(sa_blocks, extra_feature_channels, embed_dim=
         else:
             block = functools.partial(PointNetSAModule, num_centers=num_centers, radius=radius,
                                       num_neighbors=num_neighbors)
+<<<<<<< Updated upstream
         sa_blocks.append(block(in_channels=extra_feature_channels+(embed_dim if k==0 else 0 ), out_channels=out_channels,
+=======
+        sa_blocks.append(block(in_channels=extra_feature_channels, out_channels=out_channels,
+>>>>>>> Stashed changes
                                include_coordinates=True))
         c += 1
         in_channels = extra_feature_channels = sa_blocks[-1].out_channels
@@ -113,10 +133,19 @@ def create_pointnet2_sa_components(sa_blocks, extra_feature_channels, embed_dim=
         else:
             sa_layers.append(nn.Sequential(*sa_blocks))
 
+<<<<<<< Updated upstream
     return sa_layers, sa_in_channels, in_channels, 1 if num_centers is None else num_centers
 
 
 def create_pointnet2_fp_modules(fp_blocks, in_channels, sa_in_channels, embed_dim=64, use_att=False,
+=======
+    # print("sa in channels", sa_in_channels)
+    # print("================")
+    return sa_layers, sa_in_channels, in_channels, 1 if num_centers is None else num_centers
+
+
+def create_pointnet2_fp_modules(fp_blocks, in_channels, sa_in_channels, use_att=False,
+>>>>>>> Stashed changes
                                 dropout=0.1,
                                 with_se=False, normalize=True, eps=0,
                                 width_multiplier=1, voxel_resolution_multiplier=1):
@@ -128,7 +157,11 @@ def create_pointnet2_fp_modules(fp_blocks, in_channels, sa_in_channels, embed_di
         fp_blocks = []
         out_channels = tuple(int(r * oc) for oc in fp_configs)
         fp_blocks.append(
+<<<<<<< Updated upstream
             PointNetFPModule(in_channels=in_channels + sa_in_channels[-1 - fp_idx] + embed_dim, out_channels=out_channels)
+=======
+            PointNetFPModule(in_channels=in_channels + sa_in_channels[-1 - fp_idx], out_channels=out_channels)
+>>>>>>> Stashed changes
         )
         in_channels = out_channels[-1]
 
@@ -144,7 +177,10 @@ def create_pointnet2_fp_modules(fp_blocks, in_channels, sa_in_channels, embed_di
                                               dropout=dropout,
                                               with_se=with_se, with_se_relu=True,
                                               normalize=normalize, eps=eps)
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
                 fp_blocks.append(block(in_channels, out_channels))
                 in_channels = out_channels
         if len(fp_blocks) == 1:
@@ -168,7 +204,11 @@ class PVCNN2Base(nn.Module):
         self.in_channels = extra_feature_channels + 3
 
         sa_layers, sa_in_channels, channels_sa_features, _ = create_pointnet2_sa_components(
+<<<<<<< Updated upstream
             sa_blocks=self.sa_blocks, extra_feature_channels=extra_feature_channels, with_se=True, embed_dim=embed_dim,
+=======
+            sa_blocks=self.sa_blocks, extra_feature_channels=extra_feature_channels, with_se=True, 
+>>>>>>> Stashed changes
             use_att=use_att, dropout=dropout,
             width_multiplier=width_multiplier, voxel_resolution_multiplier=voxel_resolution_multiplier
         )
@@ -179,7 +219,11 @@ class PVCNN2Base(nn.Module):
         # only use extra features in the last fp module
         sa_in_channels[0] = extra_feature_channels
         fp_layers, channels_fp_features = create_pointnet2_fp_modules(
+<<<<<<< Updated upstream
             fp_blocks=self.fp_blocks, in_channels=channels_sa_features, sa_in_channels=sa_in_channels, with_se=True, embed_dim=embed_dim,
+=======
+            fp_blocks=self.fp_blocks, in_channels=channels_sa_features, sa_in_channels=sa_in_channels, with_se=True, 
+>>>>>>> Stashed changes
             use_att=use_att, dropout=dropout,
             width_multiplier=width_multiplier, voxel_resolution_multiplier=voxel_resolution_multiplier
         )
@@ -190,12 +234,15 @@ class PVCNN2Base(nn.Module):
                                           classifier=True, dim=2, width_multiplier=width_multiplier)
         self.classifier = nn.Sequential(*layers)
 
+<<<<<<< Updated upstream
         self.embedf = nn.Sequential(
             nn.Linear(embed_dim, embed_dim),
             nn.LeakyReLU(0.1, inplace=True),
             nn.Linear(embed_dim, embed_dim),
         )
 
+=======
+>>>>>>> Stashed changes
 
     def forward(self, inputs):
         # inputs : [B, in_channels + S, N]

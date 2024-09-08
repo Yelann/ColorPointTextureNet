@@ -13,7 +13,11 @@ class BallQuery(nn.Module):
         self.num_neighbors = num_neighbors
         self.include_coordinates = include_coordinates
 
+<<<<<<< Updated upstream
     def forward(self, points_coords, centers_coords, temb, points_features=None):
+=======
+    def forward(self, points_coords, centers_coords, points_features=None):
+>>>>>>> Stashed changes
         points_coords = points_coords.contiguous()
         centers_coords = centers_coords.contiguous()
         neighbor_indices = F.ball_query(centers_coords, points_coords, self.radius, self.num_neighbors)
@@ -27,7 +31,11 @@ class BallQuery(nn.Module):
             neighbor_features = F.grouping(points_features, neighbor_indices)
             if self.include_coordinates:
                 neighbor_features = torch.cat([neighbor_coordinates, neighbor_features], dim=1)
+<<<<<<< Updated upstream
         return neighbor_features, F.grouping(temb, neighbor_indices)
+=======
+        return neighbor_features
+>>>>>>> Stashed changes
 
     def extra_repr(self):
         return 'radius={}, num_neighbors={}{}'.format(

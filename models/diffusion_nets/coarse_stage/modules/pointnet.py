@@ -78,6 +78,7 @@ class PointNetSAModule(nn.Module):
         self.mlps = nn.ModuleList(mlps)
 
     def forward(self, inputs):
+<<<<<<< Updated upstream
         features, coords, temb = inputs
         centers_coords = F.furthest_point_sample(coords, self.num_centers)
         features_list = []
@@ -88,6 +89,16 @@ class PointNetSAModule(nn.Module):
             return features_list[0], centers_coords, temb.max(dim=-1).values if temb.shape[1] > 0 else temb
         else:
             return features_list[0], centers_coords, temb.max(dim=-1).values if temb.shape[1] > 0 else temb
+=======
+        # features, coords, temb = inputs
+        features, coords = inputs
+        centers_coords = F.furthest_point_sample(coords, self.num_centers)
+        features_list = []
+        for grouper, mlp in zip(self.groupers, self.mlps):
+            features = mlp(grouper(coords, centers_coords, features))
+            features_list.append(features.max(dim=-1).values)
+        return features_list[0], centers_coords
+>>>>>>> Stashed changes
 
     def extra_repr(self):
         return f'num_centers={self.num_centers}, out_channels={self.out_channels}'
@@ -100,14 +111,26 @@ class PointNetFPModule(nn.Module):
 
     def forward(self, inputs):
         if len(inputs) == 3:
+<<<<<<< Updated upstream
             points_coords, centers_coords, centers_features, temb = inputs
             points_features = None
         else:
             points_coords, centers_coords, centers_features, points_features, temb = inputs
         interpolated_features = F.nearest_neighbor_interpolate(points_coords, centers_coords, centers_features)
         interpolated_temb = F.nearest_neighbor_interpolate(points_coords, centers_coords, temb)
+=======
+            points_coords, centers_coords, centers_features = inputs
+            points_features = None
+        else:
+            points_coords, centers_coords, centers_features, points_features = inputs
+        interpolated_features = F.nearest_neighbor_interpolate(points_coords, centers_coords, centers_features)
+>>>>>>> Stashed changes
         if points_features is not None:
             interpolated_features = torch.cat(
                 [interpolated_features, points_features], dim=1
             )
+<<<<<<< Updated upstream
         return self.mlp(interpolated_features), points_coords, interpolated_temb
+=======
+        return self.mlp(interpolated_features), points_coords
+>>>>>>> Stashed changes

@@ -13,7 +13,11 @@ class Cond_PVCNN2Base(PVCNN2Base):
         self.embed_dim = embed_dim
 
         sa_layers, sa_in_channels, channels_sa_features, _ = create_pointnet2_sa_components(
+<<<<<<< Updated upstream
             sa_blocks=self.sa_blocks, extra_feature_channels=extra_feature_channels, with_se=True, embed_dim=embed_dim,
+=======
+            sa_blocks=self.sa_blocks, extra_feature_channels=extra_feature_channels, with_se=True,
+>>>>>>> Stashed changes
             use_att=use_att, dropout=dropout,
             width_multiplier=width_multiplier, voxel_resolution_multiplier=voxel_resolution_multiplier
         )
@@ -22,10 +26,16 @@ class Cond_PVCNN2Base(PVCNN2Base):
         self.global_att = None if not use_att else Attention(channels_sa_features, 8, D=1)
 
         # only use extra features in the last fp module
+<<<<<<< Updated upstream
         sa_in_channels[0] = extra_feature_channels
         fp_layers, channels_fp_features = create_pointnet2_fp_modules(
             fp_blocks=self.fp_blocks, in_channels=channels_sa_features, sa_in_channels=sa_in_channels, with_se=True,
             embed_dim=embed_dim,
+=======
+        # sa_in_channels[0] = extra_feature_channels
+        fp_layers, channels_fp_features = create_pointnet2_fp_modules(
+            fp_blocks=self.fp_blocks, in_channels=channels_sa_features, sa_in_channels=sa_in_channels, with_se=True,
+>>>>>>> Stashed changes
             use_att=use_att, dropout=dropout,
             width_multiplier=width_multiplier, voxel_resolution_multiplier=voxel_resolution_multiplier
         )
@@ -35,11 +45,14 @@ class Cond_PVCNN2Base(PVCNN2Base):
                                           classifier=True, dim=2, width_multiplier=width_multiplier)
         self.classifier = nn.Sequential(*layers)
 
+<<<<<<< Updated upstream
         self.embedf = nn.Sequential(
             nn.Linear(embed_dim, embed_dim),
             nn.LeakyReLU(0.1, inplace=True),
             nn.Linear(embed_dim, embed_dim),
         )
+=======
+>>>>>>> Stashed changes
 
     def forward(self, inputs, cond=None):
         coords, features = cond[:, :3, :].contiguous(), torch.cat([inputs, cond], dim=1)
